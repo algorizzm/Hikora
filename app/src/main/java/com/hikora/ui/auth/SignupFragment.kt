@@ -26,8 +26,10 @@ class SignupFragment : Fragment() {
         val etConfirm = view.findViewById<EditText>(R.id.etConfirmPassword)
         val btnSignup = view.findViewById<Button>(R.id.btnSignup)
         val tvError = view.findViewById<TextView>(R.id.tvError)
-        val btnBack = view.findViewById<TextView>(R.id.btnBackLogin)
+        val btnBack = view.findViewById<ImageView>(R.id.btnBackLogin)
         val etName = view.findViewById<EditText>(R.id.etName)
+        val cbTerms = view.findViewById<CheckBox>(R.id.cbTerms)
+        val tvLoginRedirect = view.findViewById<TextView>(R.id.tvLoginRedirect)
 
         viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
 
@@ -39,6 +41,12 @@ class SignupFragment : Fragment() {
             val name = etName.text.toString().trim()
 
             // 🔴 Validation
+            if (!cbTerms.isChecked) {
+                tvError.text = "You must accept the terms"
+                tvError.visibility = View.VISIBLE
+                return@setOnClickListener
+            }
+
             if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 tvError.text = "Please fill in all fields"
                 tvError.visibility = View.VISIBLE
@@ -76,6 +84,16 @@ class SignupFragment : Fragment() {
 
         btnBack.setOnClickListener {
             findNavController().navigateUp()
+        }
+
+        tvLoginRedirect.setOnClickListener {
+            findNavController().navigate(
+                R.id.loginFragment,
+                null,
+                androidx.navigation.NavOptions.Builder()
+                    .setPopUpTo(R.id.signupFragment, true)
+                    .build()
+            )
         }
 
         viewModel.authState.observe(viewLifecycleOwner) {
