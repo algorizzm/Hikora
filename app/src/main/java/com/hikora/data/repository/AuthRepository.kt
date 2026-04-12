@@ -1,0 +1,68 @@
+package com.hikora.data.repository
+
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.hikora.data.model.User
+
+class AuthRepository {
+
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    fun login(
+        email: String,
+        password: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onSuccess()
+                } else {
+                    onFailure(task.exception ?: Exception("Login failed"))
+                }
+            }
+    }
+
+    fun signup(
+        name: String,
+        email: String,
+        password: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener { result ->
+
+                val uid = result.user?.uid ?: return@addOnSuccessListener
+
+                val user = User(
+                    id = uid,
+                    name = name,
+                    email = email,
+                    role = "client"
+                )
+
+                FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(uid)
+                    .set(user)
+                    .addOnSuccessListener {
+                        onSuccess()
+                    }
+                    .addOnFailureListener { e ->
+                        onFailure(e)
+                    }
+
+            }
+            .addOnFailureListener { e ->
+                onFailure(e)
+            }
+    }
+
+    fun getCurrentUser() = auth.currentUser
+
+    fun logout() {
+        auth.signOut()
+    }
+}

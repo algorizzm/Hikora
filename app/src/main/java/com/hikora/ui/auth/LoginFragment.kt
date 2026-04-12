@@ -1,0 +1,88 @@
+package com.hikora.ui.auth
+
+import android.os.Bundle
+import android.util.Patterns
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.hikora.R
+import com.hikora.ui.auth.AuthViewModel
+
+class LoginFragment : Fragment() {
+
+    private lateinit var viewModel: AuthViewModel
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return inflater.inflate(R.layout.fragment_login, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        val etEmail = view.findViewById<EditText>(R.id.etEmail)
+        val etPassword = view.findViewById<EditText>(R.id.etPassword)
+        val btnLogin = view.findViewById<Button>(R.id.btnLogin)
+        val tvError = view.findViewById<TextView>(R.id.tvError)
+        val btnSignup = view.findViewById<TextView>(R.id.btnGoSignup)
+
+        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+
+        btnLogin.setOnClickListener {
+
+            val email = etEmail.text.toString().trim()
+            val password = etPassword.text.toString().trim()
+
+            // 🔴 Validation
+            if (email.isEmpty() || password.isEmpty()) {
+                tvError.text = "Please fill in all fields"
+                tvError.visibility = View.VISIBLE
+                return@setOnClickListener
+            }
+
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                tvError.text = "Invalid email format"
+                tvError.visibility = View.VISIBLE
+                return@setOnClickListener
+            }
+
+            if (password.length < 8) {
+                tvError.text = "Password must be at least 8 characters"
+                tvError.visibility = View.VISIBLE
+                return@setOnClickListener
+            }
+
+            tvError.visibility = View.GONE
+
+            viewModel.login(email, password)
+        }
+
+        btnSignup.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
+        }
+
+        viewModel.authState.observe(viewLifecycleOwner) {
+            if (it) {
+                Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(
+                    R.id.profileFragment,
+                    null,
+                    androidx.navigation.NavOptions.Builder()
+                        .setPopUpTo(R.id.loginFragment, true)
+                        .build()
+                )
+            }
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) {
+            tvError.text = it
+            tvError.visibility = View.VISIBLE
+        }
+    }
+}
