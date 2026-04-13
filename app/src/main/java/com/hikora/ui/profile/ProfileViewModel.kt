@@ -17,8 +17,8 @@ class ProfileViewModel : ViewModel() {
     val updateStatus: LiveData<Boolean> = _updateStatus
 
     fun loadUser() {
-        repository.fetchUser {
-            _user.postValue(it)
+        repository.getCurrentUser { user ->
+            _user.postValue(user)
         }
     }
 
@@ -27,8 +27,7 @@ class ProfileViewModel : ViewModel() {
             _updateStatus.postValue(success)
 
             if (success) {
-                // refresh UI after update
-                loadUser()
+                loadUser() // refresh UI
             }
         }
     }

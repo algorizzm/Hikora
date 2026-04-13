@@ -71,7 +71,7 @@ class LoginFragment : Fragment() {
             if (it) {
                 Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(
-                    R.id.profileFragment,
+                    R.id.homeFragment,
                     null,
                     androidx.navigation.NavOptions.Builder()
                         .setPopUpTo(R.id.loginFragment, true)

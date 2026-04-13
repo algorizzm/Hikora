@@ -6,17 +6,22 @@ import com.hikora.data.model.User
 
 class UserRepository {
 
-    private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
-    fun fetchUser(onResult: (User?) -> Unit) {
-        val uid = auth.currentUser?.uid ?: return
+    fun getCurrentUser(onResult: (User?) -> Unit) {
+        val uid = auth.currentUser?.uid
 
-        firestore.collection("users")
+        if (uid == null) {
+            onResult(null)
+            return
+        }
+
+        db.collection("users")
             .document(uid)
             .get()
-            .addOnSuccessListener { doc ->
-                val user = doc.toObject(User::class.java)
+            .addOnSuccessListener { document ->
+                val user = document.toObject(User::class.java)
                 onResult(user)
             }
             .addOnFailureListener {
@@ -25,16 +30,17 @@ class UserRepository {
     }
 
     fun updateUserName(newName: String, onResult: (Boolean) -> Unit) {
-        val uid = auth.currentUser?.uid ?: return onResult(false)
+        val uid = auth.currentUser?.uid
 
-        firestore.collection("users")
+        if (uid == null) {
+            onResult(false)
+            return
+        }
+
+        db.collection("users")
             .document(uid)
             .update("name", newName)
-            .addOnSuccessListener {
-                onResult(true)
-            }
-            .addOnFailureListener {
-                onResult(false)
-            }
+            .addOnSuccessListener { onResult(true) }
+            .addOnFailureListener { onResult(false) }
     }
 }

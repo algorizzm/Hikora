@@ -18,7 +18,7 @@ class SplashFragment : Fragment(R.layout.fragment_splash) {
 
         if (user != null) {
             // user is logged in → go to profile
-            findNavController().navigate(R.id.profileFragment)
+            findNavController().navigate(R.id.homeFragment)
         } else {
             // not logged in → go to login
             findNavController().navigate(R.id.loginFragment)

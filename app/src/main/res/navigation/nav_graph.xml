@@ -20,7 +20,7 @@
 
         <!-- ✅ FIXED: move here -->
         <action
-            android:id="@+id/action_loginFragment_to_profileFragment"
+            android:id="@+id/action_loginFragment_to_homeFragment"
             app:destination="@id/profileFragment" />
     </fragment>
 
@@ -35,6 +35,11 @@
     </fragment>
 
     <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.hikora.ui.home.HomeFragment"
+        android:label="Home" />
+
+    <fragment
         android:id="@+id/profileFragment"
         android:name="com.hikora.ui.profile.ProfileFragment"
         android:label="Profile" >
@@ -43,5 +48,20 @@
             android:id="@+id/action_profileFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/hikesFragment"
+        android:name="com.hikora.ui.hikes.HikesFragment"
+        android:label="Hikes" />
+
+    <fragment
+        android:id="@+id/reelsFragment"
+        android:name="com.hikora.ui.reels.ReelsFragment"
+        android:label="Reels" />
+
+    <fragment
+        android:id="@+id/messagesFragment"
+        android:name="com.hikora.ui.messages.MessagesFragment"
+        android:label="Messages" />
 
 </navigation>
