@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "63757711746",
+    "project_id": "hikora-ad740",
+    "storage_bucket": "hikora-ad740.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63757711746:android:667cc2f9e12b106586f79b",
+        "android_client_info": {
+          "package_name": "com.hikora"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEV4bF1P5jAxsSLk_fHBNrqBd0AZMzihc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
