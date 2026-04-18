@@ -1,68 +1,80 @@
 package com.hikora.data.repository
 
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.hikora.data.model.User
+import com.hikora.data.auth.AuthManager
 
-class AuthRepository {
+class AuthRepository(
+    private val authManager: AuthManager = AuthManager()
+) {
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val userRepository = UserRepository()
 
-    fun login(
-        email: String,
-        password: String,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    onSuccess()
-                } else {
-                    onFailure(task.exception ?: Exception("Login failed"))
-                }
-            }
+    fun login(email: String, password: String, onResult: (Boolean, String?) -> Unit) {
+        authManager.login(email, password, onResult)
     }
 
     fun signup(
         name: String,
         email: String,
         password: String,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
+        onResult: (Boolean, String?) -> Unit
     ) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnSuccessListener { result ->
+        authManager.signup(email, password) { success, firebaseUser, error ->
 
-                val uid = result.user?.uid ?: return@addOnSuccessListener
-
-                val user = User(
-                    id = uid,
-                    name = name,
-                    email = email,
-                    role = "client"
-                )
-
-                FirebaseFirestore.getInstance()
-                    .collection("users")
-                    .document(uid)
-                    .set(user)
-                    .addOnSuccessListener {
-                        onSuccess()
-                    }
-                    .addOnFailureListener { e ->
-                        onFailure(e)
-                    }
-
+            if (!success || firebaseUser == null) {
+                onResult(false, error)
+                return@signup
             }
-            .addOnFailureListener { e ->
-                onFailure(e)
+
+            val user = User(
+                id = firebaseUser.uid,
+                name = name,
+                email = email
+            )
+
+            // 🔥 WAIT for Firestore write
+            userRepository.createUser(user) { created ->
+
+                if (created) {
+
+                    // 🔥 CRITICAL: sync cache immediately
+                    userRepository.setCachedUser(user)
+
+                    onResult(true, null)
+
+                } else {
+                    onResult(false, "Failed to save user data")
+                }
             }
+        }
     }
-
-    fun getCurrentUser() = auth.currentUser
 
     fun logout() {
-        auth.signOut()
+        authManager.logout()
     }
+
+    fun isLoggedIn(): Boolean {
+        return authManager.isLoggedIn()
+    }
+
+    fun isUserCached(): Boolean {
+        return userRepository.isUserCached()
+    }
+
+    fun getCurrentUserId(): String? {
+        return authManager.getCurrentUser()?.uid
+    }
+
+    fun syncUserFromFirestore(onDone: () -> Unit) {
+        val uid = getCurrentUserId() ?: return onDone()
+
+        userRepository.refreshUser { user ->
+            if (user != null) {
+                userRepository.setCachedUser(user)
+            }
+            onDone()
+        }
+    }
+
+    fun observeAuthState() = authManager.observeAuthState()
 }

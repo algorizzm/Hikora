@@ -2,27 +2,16 @@ package com.hikora.ui.auth
 
 import android.os.Bundle
 import android.util.Patterns
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.hikora.R
-import com.hikora.ui.auth.AuthViewModel
+import androidx.navigation.fragment.findNavController
 
-class LoginFragment : Fragment() {
+class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private lateinit var viewModel: AuthViewModel
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.fragment_login, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
@@ -39,7 +28,7 @@ class LoginFragment : Fragment() {
             val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString().trim()
 
-            // 🔴 Validation
+            // Validation
             if (email.isEmpty() || password.isEmpty()) {
                 tvError.text = "Please fill in all fields"
                 tvError.visibility = View.VISIBLE
@@ -60,29 +49,21 @@ class LoginFragment : Fragment() {
 
             tvError.visibility = View.GONE
 
-            viewModel.login(email, password)
+            // ✅ AUTH ONLY (NO NAVIGATION)
+            viewModel.login(email, password) { success, error ->
+
+                if (!success) {
+                    tvError.text = error ?: "Login failed"
+                    tvError.visibility = View.VISIBLE
+                } else {
+                    Toast.makeText(requireContext(), "Login successful", Toast.LENGTH_SHORT).show()
+                    // Navigation handled by AuthState observer (Splash/MainActivity)
+                }
+            }
         }
 
         btnSignup.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
-        }
-
-        viewModel.authState.observe(viewLifecycleOwner) {
-            if (it) {
-                Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(
-                    R.id.homeFragment,
-                    null,
-                    androidx.navigation.NavOptions.Builder()
-                        .setPopUpTo(R.id.loginFragment, true)
-                        .build()
-                )
-            }
-        }
-
-        viewModel.error.observe(viewLifecycleOwner) {
-            tvError.text = it
-            tvError.visibility = View.VISIBLE
         }
     }
 }

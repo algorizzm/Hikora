@@ -1,17 +1,17 @@
-package com.hikora.ui.hikes
+package com.hikora.ui.reels
 
 import com.hikora.R
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-class HikesFragment : Fragment(R.layout.fragment_hikes) {
+class ReelsFragment : Fragment(R.layout.fragment_reels) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val title = view.findViewById<TextView>(R.id.tvTitle)
         val desc = view.findViewById<TextView>(R.id.tvDescription)
 
-        title.text = "Hikes"
-        desc.text = "Browse and book hiking adventures"
+        title.text = "Reels"
+        desc.text = "Watch hiking reels and short clips"
     }
 }
