@@ -29,6 +29,14 @@ class UserRepository {
             }
     }
 
+    fun clearUserSession() {
+        // Sign out the user from Firebase Authentication
+        auth.signOut()
+
+        // Clear any locally cached user data if applicable
+        db.clearPersistence()
+    }
+
     fun updateUserName(newName: String, onResult: (Boolean) -> Unit) {
         val uid = auth.currentUser?.uid
 

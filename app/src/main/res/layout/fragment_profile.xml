@@ -37,7 +37,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/tvHandle"
+                android:id="@+id/tvEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@taylorswift | Intermediate"
@@ -54,7 +54,7 @@
                 android:layout_marginTop="24dp"
                 android:gravity="center"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@id/tvHandle">
+                app:layout_constraintTop_toBottomOf="@id/tvEmail">
                 <include layout="@layout/item_profile_stat" />
                 <include layout="@layout/item_profile_stat" />
                 <include layout="@layout/item_profile_stat" />
@@ -81,13 +81,18 @@
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp"
                 app:layout_constraintTop_toBottomOf="@id/tagsRow">
-                <include layout="@layout/edit_profile_menu" />
+
+                <include
+                    android:id="@+id/layoutEditProfileMenu"
+                    layout="@layout/edit_profile_menu" />
                 <View style="@style/HikoraDivider" />
                 <include layout="@layout/my_trails_menu" />
                 <View style="@style/HikoraDivider" />
                 <include layout="@layout/change_password_menu" />
                 <View style="@style/HikoraDivider" />
-                <include layout="@layout/sign_out_menu" />
+                <include
+                    android:id="@+id/layoutSignOutMenu"
+                    layout="@layout/sign_out_menu" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -144,6 +149,7 @@
                 android:background="@drawable/bg_circle_sage" />
 
             <TextView
+                android:id="@+id/avatarText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

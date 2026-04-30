@@ -3,8 +3,10 @@ package com.hikora.ui.profile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.hikora.data.model.User
 import com.hikora.data.repository.UserRepository
+import kotlinx.coroutines.launch
 
 class ProfileViewModel : ViewModel() {
 
@@ -15,6 +17,9 @@ class ProfileViewModel : ViewModel() {
 
     private val _updateStatus = MutableLiveData<Boolean>()
     val updateStatus: LiveData<Boolean> = _updateStatus
+
+    private val _logoutStatus = MutableLiveData<Boolean>()
+    val logoutStatus: LiveData<Boolean> = _logoutStatus
 
     fun loadUser() {
         repository.getCurrentUser { user ->
@@ -28,6 +33,18 @@ class ProfileViewModel : ViewModel() {
 
             if (success) {
                 loadUser() // refresh UI
+            }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            try {
+                repository.clearUserSession() // Implement this in UserRepository
+                _logoutStatus.postValue(true)
+                _user.postValue(null)
+            } catch (e: Exception) {
+                _logoutStatus.postValue(false)
             }
         }
     }
